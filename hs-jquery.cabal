@@ -9,7 +9,7 @@ License-file:        LICENSE
 Author:              Nils Schweinsberg <mail@n-sch.de>
 Maintainer:          Nils Schweinsberg <mail@n-sch.de>
 
-Category:            Web
+Category:            Language
 
 Build-type:          Simple
 
@@ -30,9 +30,9 @@ Library
   hs-source-dirs: src
 
   Exposed-modules:     
-    Happstack.JQuery
+    Language.JQuery
 
   Other-modules:       
-    Happstack.JQuery.Functions
-    Happstack.JQuery.Types
-    Happstack.JQuery.JavaScript
+    Language.JQuery.Functions
+    Language.JQuery.Types
+    Language.JQuery.JavaScript

@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE ViewPatterns #-}
 
-module Happstack.JQuery.JavaScript
+module Language.JQuery.JavaScript
   ( jqueryToHtml ) where
 
 import Control.Monad.State
@@ -15,7 +15,7 @@ import Language.JavaScript.AST
 --import Language.JavaScript.Pretty
 import Language.JavaScript.NonEmptyList
 
-import Happstack.JQuery.Types
+import Language.JQuery.Types
 
 jqueryToHtml :: JQuery () -> Html
 jqueryToHtml jq =

@@ -2,12 +2,12 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Happstack.JQuery.Functions where
+module Language.JQuery.Functions where
 
 import Text.Blaze.Html
 
 --import Language.JavaScript.AST
-import Happstack.JQuery.Types
+import Language.JQuery.Types
 
 (~>) :: JQueryStmt a -> JQueryStmt b -> JQueryStmt b
 (~>) = JQS_chain

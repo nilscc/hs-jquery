@@ -3,7 +3,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 
-module Happstack.JQuery.Types where
+module Language.JQuery.Types where
 
 import Control.Monad.State
 
