@@ -15,23 +15,55 @@ import Text.Blaze.Html
 import Text.Blaze.Html.Renderer.String
 import Language.JavaScript.AST
 
-data JQueryStmt t where
+data JQueryStmt where
 
-  JQS_chain        :: JQueryStmt a -> JQueryStmt b -> JQueryStmt b
+  JQS_jQuery       :: JQuerySelector sel =>                sel -> JQueryStmts t -> JQueryStmt
+  JQS_bind         :: JQuerySelector sel => JQueryVar t -> sel -> JQueryStmts t -> JQueryStmt
 
-  JQS_call         :: String -> [Expr] -> JQueryStmt ()
-  JQS_str_call     :: String -> [Expr] -> JQueryStmt String
-  JQS_double_call  :: String -> [Expr] -> JQueryStmt Double
-  JQS_html_call    :: String -> [Expr] -> JQueryStmt Html
 
-  -- CSS
-  --JQS_get_css      :: StringValue str => str -> JQueryStmt String
-  --JQS_set_css      :: (StringValue str1, StringValue str2) => str1 -> str2 -> JQueryStmt ()
+data JQueryStmts t where
 
-  -- Manipulation
-  --JQS_get_html     :: JQueryStmt Html
-  --JQS_set_html     :: HtmlValue html => html -> JQueryStmt ()
+  JQSs_chain        :: JQueryStmts a -> JQueryStmts b -> JQueryStmts b
+  JQSs_call         :: String -> [Expr] -> JQueryStmts a
 
+newtype JQuery a = JQuery { unJQ :: State JQueryS a }
+
+data JQueryS = JQueryS
+  { jqueryLastStmt  :: Maybe JQueryStmt
+  , jqueryLastVarId :: Int
+  , jqueryChain     :: JQueryChain
+  }
+
+data JQueryChain where
+
+  JQC_empty  ::                               JQueryChain
+  JQC_single ::                 JQueryStmt -> JQueryChain
+  JQC_chain  ::  JQueryChain -> JQueryStmt -> JQueryChain
+
+{-
+instance Monad JQuery where
+  (JQuery a) >> (JQuery b) = JQuery $ a >> b
+  (JQuery a) >>= f         = JQuery $ do
+    r <- a
+    v <- newVar
+    modify $ \s -> s
+      { jqueryChain = let c = jqueryChain s in case c of
+          JQC_empty           -> error "JQuery: Empty bind statement."
+          --JQC_single sel stmt -> JQC_single sel (JQ_bind 
+      }
+    let JQuery b = f r
+    b
+   where
+    newVar = do
+      s <- get
+      put s{ jqueryVarCount = jqueryVarCount s + 1 }
+      let Right n = name $ "hs_jquery_" ++ show (jqueryVarCount s)
+      return $ JQueryVar n
+-}
+
+
+
+{-
 data JQuery t where
 
   JQ_chain  :: JQuery a -> JQuery b        -> JQuery b
@@ -44,38 +76,18 @@ instance Monad JQuery where
   a >>  b = JQ_chain a b
   a >>= b = JQ_bind  a b
   return  = JQ_return
+-}
 
 --------------------------------------------------------------------------------
 -- newtypes
 
-newtype Object = Object Name
+newtype JQueryObject = JQueryObject Name
 
 
 --------------------------------------------------------------------------------
 -- Variables
 
-class JQueryVariables a where
-  type Var a
-
-instance JQueryVariables () where
-  type Var () = ()
-
 newtype JQueryVar a = JQueryVar Name
-
-instance JQueryVariables String where
-  type Var String = JQueryVar String
-
-instance JQueryVariables Double where
-  type Var Double = JQueryVar Double
-
-instance JQueryVariables Bool where
-  type Var Bool = JQueryVar Bool
-
-instance JQueryVariables Html where
-  type Var Html = JQueryVar Html
-
---instance JQueryVariables Object where
-  --type Var Object = JQVar
 
 
 --------------------------------------------------------------------------------
@@ -120,5 +132,5 @@ instance JQuerySelector String where
   selToExpr (jsString -> Right jss) = ExprLit (LitString jss)
   selToExpr s = error $ "`JQuerySelector selToExpr' conversion error of String \"" ++ s ++ "\""
 
-instance JQuerySelector Object where
-  selToExpr (Object n) = ExprName n
+instance JQuerySelector JQueryObject where
+  selToExpr (JQueryObject n) = ExprName n

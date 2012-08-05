@@ -37,4 +37,5 @@ Library
   Other-modules:       
     Language.JQuery.Functions
     Language.JQuery.JavaScript
+    Language.JQuery.Internal.Functions
     Language.JQuery.Internal.Types

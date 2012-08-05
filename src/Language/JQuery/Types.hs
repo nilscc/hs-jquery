@@ -4,10 +4,12 @@ module Language.JQuery.Types
     -- * JQuery selectors
   , JQuerySelector
     -- * JQuery vars
-  , JQueryVariables(..), JQueryVar
+  , JQueryVar
     -- * JavaScript values
   , JavaScriptValue
   , StringValue, HtmlValue
+    -- * Other
+  , JQueryObject
   ) where
 
 import Language.JQuery.Internal.Types
