@@ -40,43 +40,6 @@ data JQueryChain where
   JQC_single ::                 JQueryStmt -> JQueryChain
   JQC_chain  ::  JQueryChain -> JQueryStmt -> JQueryChain
 
-{-
-instance Monad JQuery where
-  (JQuery a) >> (JQuery b) = JQuery $ a >> b
-  (JQuery a) >>= f         = JQuery $ do
-    r <- a
-    v <- newVar
-    modify $ \s -> s
-      { jqueryChain = let c = jqueryChain s in case c of
-          JQC_empty           -> error "JQuery: Empty bind statement."
-          --JQC_single sel stmt -> JQC_single sel (JQ_bind 
-      }
-    let JQuery b = f r
-    b
-   where
-    newVar = do
-      s <- get
-      put s{ jqueryVarCount = jqueryVarCount s + 1 }
-      let Right n = name $ "hs_jquery_" ++ show (jqueryVarCount s)
-      return $ JQueryVar n
--}
-
-
-
-{-
-data JQuery t where
-
-  JQ_chain  :: JQuery a -> JQuery b        -> JQuery b
-  JQ_bind   :: JQuery a -> (a -> JQuery b) -> JQuery b
-  JQ_return :: a                           -> JQuery a
-
-  JQ_select :: JQuerySelector sel => sel -> JQueryStmt a -> JQuery (Var a)
-
-instance Monad JQuery where
-  a >>  b = JQ_chain a b
-  a >>= b = JQ_bind  a b
-  return  = JQ_return
--}
 
 --------------------------------------------------------------------------------
 -- newtypes
