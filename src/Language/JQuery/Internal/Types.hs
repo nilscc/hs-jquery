@@ -19,13 +19,18 @@ data JQueryStmt t where
 
   JQS_chain        :: JQueryStmt a -> JQueryStmt b -> JQueryStmt b
 
+  JQS_call         :: String -> [Expr] -> JQueryStmt ()
+  JQS_str_call     :: String -> [Expr] -> JQueryStmt String
+  JQS_double_call  :: String -> [Expr] -> JQueryStmt Double
+  JQS_html_call    :: String -> [Expr] -> JQueryStmt Html
+
   -- CSS
-  JQS_get_css      :: StringValue str => str -> JQueryStmt String
-  JQS_set_css      :: (StringValue str1, StringValue str2) => str1 -> str2 -> JQueryStmt ()
+  --JQS_get_css      :: StringValue str => str -> JQueryStmt String
+  --JQS_set_css      :: (StringValue str1, StringValue str2) => str1 -> str2 -> JQueryStmt ()
 
   -- Manipulation
-  JQS_get_html     :: JQueryStmt Html
-  JQS_set_html     :: HtmlValue html => html -> JQueryStmt ()
+  --JQS_get_html     :: JQueryStmt Html
+  --JQS_set_html     :: HtmlValue html => html -> JQueryStmt ()
 
 data JQuery t where
 

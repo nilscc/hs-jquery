@@ -111,11 +111,11 @@ mkSelect s st = (LValue (toN "$") l, RVInvoke (singleton r))
         -> JQueryStmt a
         -> ( [([Invocation],Refinement)], Invocation )
   mkSel ls li stmt = case stmt of
-    JQS_chain    a b -> let (ls',li') = mkSel ls li a
-                         in mkSel ls' li' b
-    JQS_get_html     -> invoke "html" [ ]
-    JQS_set_html h   -> invoke "html" [ valToExpr h ]
-    JQS_get_css  n   -> invoke "css"  [ valToExpr n ]
-    JQS_set_css  n c -> invoke "css"  [ valToExpr n, valToExpr c ]
+    JQS_chain       a b    -> let (ls',li') = mkSel ls li a
+                               in mkSel ls' li' b
+    JQS_call        f args -> invoke f args
+    JQS_str_call    f args -> invoke f args
+    JQS_double_call f args -> invoke f args
+    JQS_html_call   f args -> invoke f args
    where
     invoke n expr = ( ls ++ [([li], Property (toN n))], Invocation expr)

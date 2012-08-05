@@ -22,17 +22,17 @@ jQuery = JQ_select
 -- ** CSS
 
 getCSS :: StringValue s => s -> JQueryStmt String
-getCSS = JQS_get_css
+getCSS s = JQS_str_call "css" [valToExpr s]
 
 setCSS :: (StringValue s1, StringValue s2) => s1 -> s2 -> JQueryStmt ()
-setCSS = JQS_set_css
+setCSS s1 s2 = JQS_call "css" [valToExpr s1, valToExpr s2]
 
 
 --------------------------------------------------------------------------------
 -- ** Manipulation
 
 getHtml :: JQueryStmt Html
-getHtml = JQS_get_html
+getHtml = JQS_html_call "html" []
 
 setHtml :: HtmlValue html => html -> JQueryStmt ()
-setHtml = JQS_set_html
+setHtml h = JQS_call "html" [valToExpr h]
