@@ -1,0 +1,38 @@
+Name:                hs-jquery
+Version:             0.1
+Synopsis:            jQuery functions implementations for the happstack web framework
+Homepage:            https://github.com/mcmaniac/hs-jquery
+
+License:             BSD3
+License-file:        LICENSE
+
+Author:              Nils Schweinsberg <mail@n-sch.de>
+Maintainer:          Nils Schweinsberg <mail@n-sch.de>
+
+Category:            Web
+
+Build-type:          Simple
+
+Cabal-version:       >=1.2
+
+
+Library
+  -- Packages needed in order to build this package.
+  Build-depends:       
+    base == 4.*,
+    mtl == 2.*,
+    blaze-html == 0.5.*,
+    js-good-parts == 0.*
+
+  -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
+  -- Build-tools:         
+
+  hs-source-dirs: src
+
+  Exposed-modules:     
+    Happstack.JQuery
+
+  Other-modules:       
+    Happstack.JQuery.Functions
+    Happstack.JQuery.Types
+    Happstack.JQuery.JavaScript
