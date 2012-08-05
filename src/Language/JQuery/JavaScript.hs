@@ -46,7 +46,13 @@ jqueryToCompactString jq =
          SLine   _ d' -> compacter d'
          SChar ' ' d' -> compacter d'
          SChar   c d' -> SChar c (compacter d')
-         SText _ s d' -> SText 0 s (compacter d')
+         SText _ s d'
+           | s == "var" -> SText 0 s (varDec d')
+           | otherwise  -> SText 0 s (compacter d')
+  varDec d =
+    case d of
+         SChar ' ' d' -> SChar ' ' (compacter d')
+         _            -> compacter d
 
 -- | Generate JavaScript code from `JQuery' using `jqueryToCompactString' and
 -- wrap it into a @<script>@ tag.
