@@ -2,29 +2,63 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.JQuery.JavaScript
-  ( jqueryToHtml ) where
+  ( jqueryToString, jqueryToHtml
+  , jqueryToCompactString, jqueryToCompactHtml
+  ) where
 
 import Control.Monad.State
 
 import Text.Blaze.Html
-import Text.Blaze.Html.Renderer.String
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 
 import Language.JavaScript.AST
---import Language.JavaScript.Pretty
+import Language.JavaScript.Pretty
 import Language.JavaScript.NonEmptyList
+import Text.PrettyPrint.Leijen
 
-import Language.JQuery.Types
+import Language.JQuery.Internal.Types
 
+-- | Generate JavaScript code from `JQuery'.
+jqueryToString :: JQuery () -> String
+jqueryToString jq =
+  let p = evalState (mkProgram jq) 0
+   in show $ pretty p
+
+-- | Generate JavaScript code from `JQuery' and wrap it into a @<script>@ tag.
 jqueryToHtml :: JQuery () -> Html
 jqueryToHtml jq =
-  let _p = evalState (mkProgram jq) 0
-   in H.script ! A.type_ (toValue "text/javascript") $ undefined
+  let src = jqueryToString jq
+   in H.script ! A.type_ (toValue "text/javascript") $ toHtml src
+
+-- | Generate JavaScript code from `JQuery'. Removes all spaces between
+-- delimiters and identifiers and removes all new
+-- lines.
+jqueryToCompactString :: JQuery () -> String
+jqueryToCompactString jq =
+  let p = evalState (mkProgram jq) 0
+   in displayS (compacter . renderCompact $ pretty p) ""
+ where
+  compacter d =
+    case d of
+         SEmpty       -> SEmpty
+         SLine   _ d' -> compacter d'
+         SChar ' ' d' -> compacter d'
+         SChar   c d' -> SChar c (compacter d')
+         SText _ s d' -> SText 0 s (compacter d')
+
+-- | Generate JavaScript code from `JQuery' using `jqueryToCompactString' and
+-- wrap it into a @<script>@ tag.
+jqueryToCompactHtml :: JQuery () -> Html
+jqueryToCompactHtml jq =
+  let src = jqueryToCompactString jq
+   in H.script ! A.type_ (toValue "text/javascript") $ toHtml src
+
 
 --------------------------------------------------------------------------------
 -- Helper
 
+{-
 toJSString :: String  -- ^ name of the calling function for error messages
            -> String  -- ^ string to convert
            -> JSString
@@ -32,6 +66,7 @@ toJSString n s =
   case jsString s of
        Right jss -> jss
        Left  err -> error $ "Error in `" ++ n ++ "': " ++ err
+-}
 
 toName :: String -- ^ name of the calling function
        -> String
@@ -44,6 +79,8 @@ toName n s =
 --------------------------------------------------------------------------------
 -- Javascript generation
 
+type VarCount = Int
+
 mkProgram :: JQuery () -> State VarCount Program
 
 mkProgram (JQ_return _) =
@@ -51,24 +88,22 @@ mkProgram (JQ_return _) =
 
 -- TODO: JQ_chain JQ_bind
 
-mkProgram (JQ_select (toJSString "mkProgram" -> s) st) =
+mkProgram (JQ_select sel st) =
   return $ Program [ ]
                    [ StmtExpr $ ESApply (singleton lval) rval ]
  where
-  (lval, rval) = mkSelect s st
+  (lval, rval) = mkSelect (selToExpr sel) st
 
 mkProgram _ = error "Error in `mkProgram': Not implemented yet."
 
 -- $(..) statements
-mkSelect :: JSString -> JQueryStmt a -> (LValue, RValue)
+mkSelect :: Expr -> JQueryStmt a -> (LValue, RValue)
 mkSelect s st = (LValue (toN "$") l, RVInvoke (singleton r))
  where
-  toN = toName     "mkSelect"
-  toS = toJSString "mkSelect"
-  str = ExprLit . LitString . toS
+  toN = toName "mkSelect"
 
   (l,r) = mkSel []
-                (Invocation [ExprLit (LitString s)]) -- $("...")
+                (Invocation [s]) -- \\$("...")
                 st
 
   mkSel :: [([Invocation],Refinement)]
@@ -79,9 +114,8 @@ mkSelect s st = (LValue (toN "$") l, RVInvoke (singleton r))
     JQS_chain    a b -> let (ls',li') = mkSel ls li a
                          in mkSel ls' li' b
     JQS_get_html     -> invoke "html" [ ]
-    JQS_set_html h   -> invoke "html" [ str (renderHtml h) ]
-    JQS_get_css  n   -> invoke "css"  [ str n ]
-    JQS_set_css  n c -> invoke "css"  [ str n, str c ]
+    JQS_set_html h   -> invoke "html" [ valToExpr h ]
+    JQS_get_css  n   -> invoke "css"  [ valToExpr n ]
+    JQS_set_css  n c -> invoke "css"  [ valToExpr n, valToExpr c ]
    where
     invoke n expr = ( ls ++ [([li], Property (toN n))], Invocation expr)
-

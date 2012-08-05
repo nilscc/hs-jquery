@@ -22,6 +22,7 @@ Library
     base == 4.*,
     mtl == 2.*,
     blaze-html == 0.5.*,
+    wl-pprint == 1.*,
     js-good-parts == 0.*
 
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
@@ -31,8 +32,9 @@ Library
 
   Exposed-modules:     
     Language.JQuery
+    Language.JQuery.Types
 
   Other-modules:       
     Language.JQuery.Functions
-    Language.JQuery.Types
     Language.JQuery.JavaScript
+    Language.JQuery.Internal.Types
