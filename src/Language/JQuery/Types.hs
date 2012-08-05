@@ -1,6 +1,6 @@
 module Language.JQuery.Types
   ( -- * JQuery monad and statements
-    JQuery, JQueryStmt
+    JQuery, JQueryStmt, JQueryStmts
     -- * JQuery selectors
   , JQuerySelector
     -- * JQuery vars

@@ -21,7 +21,7 @@ import Language.JQuery.Internal.Functions
 import Language.JQuery.Internal.Types
 
 runJQ :: JQuery () -> Program
-runJQ jq = mkProgram . jqueryChain $ execState (unJQ jq) nullJQueryS
+runJQ jq = mkProgram . jqueryChain $ execState (unJQ jq >> discardBinding) nullJQueryS
 
 -- | Generate JavaScript code from `JQuery'.
 jqueryToString :: JQuery () -> String

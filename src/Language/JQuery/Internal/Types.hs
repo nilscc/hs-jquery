@@ -17,8 +17,10 @@ import Language.JavaScript.AST
 
 data JQueryStmt where
 
-  JQS_jQuery       :: JQuerySelector sel =>                sel -> JQueryStmts t -> JQueryStmt
-  JQS_bind         :: JQuerySelector sel => JQueryVar t -> sel -> JQueryStmts t -> JQueryStmt
+  JQS_jQuery       :: (JQueryVariable t, JQuerySelector sel)
+                   =>                sel -> JQueryStmts t -> JQueryStmt
+  JQS_bind         :: (JQueryVariable t, JQuerySelector sel)
+                   => JQueryVar t -> sel -> JQueryStmts t -> JQueryStmt
 
 
 data JQueryStmts t where
@@ -52,6 +54,20 @@ newtype JQueryObject = JQueryObject Name
 
 newtype JQueryVar a = JQueryVar Name
 
+class JQueryVariable a where
+  type Var a
+  bindable :: JQueryStmts a -> Bool
+  toVar    :: JQueryStmts a -> Name -> Var a
+
+instance JQueryVariable () where
+  type Var () = ()
+  bindable _ = False
+  toVar  _ _ = ()
+
+instance JQueryVariable String where
+  type Var String = JQueryVar String
+  bindable _ = True
+  toVar  _ n = JQueryVar n
 
 --------------------------------------------------------------------------------
 -- Values

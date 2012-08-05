@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Language.JQuery
-  ( JQuery, JQueryVar, JQueryObject
+  ( JQuery, JQueryStmts, JQueryVar, JQueryObject
      -- * JQuery functions
   , module Language.JQuery.Functions
     -- * HTML conversion
